@@ -146,15 +146,18 @@ export default function Game() {
   const xIsNext = currentMove % 2 === 0;
 
   const [currentSquareCoordinates, setCurrentSquareCoordinates] = useState([])
-  console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : null}`);
+  // console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : null}`);
 
   function handlePlay(nextSquares, setCurrentSquareCoordinates) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-    const intersection = nextSquares.filter((item)=> !history.includes(item) && item !== null);
-    console.log(history,nextHistory,nextSquares, intersection);
+    for(let i = 0; i < history.length; i++ ){
+      const result = history[i] === nextSquares[i] ? "Same" : "Different";
+      console.log(i, result);
+  }
+    
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-    setCurrentSquareCoordinates(intersection);
+    setCurrentSquareCoordinates([]);
   }
 
   function jumpTo(nextMove) {
