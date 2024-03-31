@@ -11,7 +11,7 @@ const Square = ({ value, onSquareClick, isWinnerSquare }) => {
   );
 };
 
-function Board({ xIsNext, squares, onPlay, setCurrentSquareCoords }) {
+function Board({ xIsNext, squares, onPlay, setCurrentSquareCoordinates }) {
   //const [squares, setSquares] = useState(Array(9).fill(null));
   //const [xIsNext, setXIsNext] = useState(true);
 
@@ -25,9 +25,8 @@ function Board({ xIsNext, squares, onPlay, setCurrentSquareCoords }) {
 
     //Define the symbol
     nextSquares[i] = xIsNext ? "X" : "O";
-    // console.log(`squares[${i}] = ${nextSquares[i]}`);
-    // currentMoveCouple = [i, nextSquares[i]]
-    onPlay(nextSquares);
+    setCurrentSquareCoordinates([1,2]);
+    onPlay(nextSquares,setCurrentSquareCoordinates);
   }
 
   const [winner, winnerSquares] = calculateWinner(squares);
@@ -140,20 +139,22 @@ function ToggleMovesListOrder({ listOrder, setListOrder }) {
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
-  const [currentSquareCoordinates, setCurrentSquareCoordinates] = useState([]);
-
   //False for normal behaviour, true for ascending order
   const [listOrder, setListOrder] = useState(false);
 
   const currentSquares = history[currentMove];
   const xIsNext = currentMove % 2 === 0;
 
-  function handlePlay(nextSquares) {
+  const [currentSquareCoordinates, setCurrentSquareCoordinates] = useState([])
+  console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : null}`);
+
+  function handlePlay(nextSquares, setCurrentSquareCoordinates) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     const intersection = nextSquares.filter((item)=> !history.includes(item) && item !== null);
-    console.log(intersection);
+    console.log(history,nextHistory,nextSquares, intersection);
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    setCurrentSquareCoordinates(intersection);
   }
 
   function jumpTo(nextMove) {
@@ -193,7 +194,7 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board setCurrentSquareCoords={setCurrentSquareCoordinates} xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board setCurrentSquareCoordinates={setCurrentSquareCoordinates} xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
         <ToggleMovesListOrder
