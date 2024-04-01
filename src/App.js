@@ -25,7 +25,6 @@ function Board({ xIsNext, squares, onPlay, setCurrentSquareCoordinates }) {
 
     //Define the symbol
     nextSquares[i] = xIsNext ? "X" : "O";
-    setCurrentSquareCoordinates([1,2]);
     onPlay(nextSquares,setCurrentSquareCoordinates);
   }
 
@@ -146,19 +145,30 @@ export default function Game() {
   const xIsNext = currentMove % 2 === 0;
 
   const [currentSquareCoordinates, setCurrentSquareCoordinates] = useState([])
-  // console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : null}`);
+  console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : "Game Start"}`);
 
   function handlePlay(nextSquares, setCurrentSquareCoordinates) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-    for(let i = 0; i < history.length; i++ ){
-      const result = history[i] === nextSquares[i] ? "Same" : "Different";
-      console.log(i, result);
-  }
+    
+    history[history.length - 1].forEach((item, index) => {
+      if(nextHistory[nextHistory.length - 1][index] !== item){
+        // console.log(`Yes: ${index}`);
+        setCurrentSquareCoordinates(
+          index < 3
+          ? [1, index + 1]
+          : index < 6
+          ? [2, index - 2]
+          : [3, index - 5]);
+      } else {
+        // console.log(`Nope: ${index}`);
+      }
+    })
+  
     
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-    setCurrentSquareCoordinates([]);
   }
+
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
@@ -173,7 +183,8 @@ export default function Game() {
     let description;
 
     if (move > 0 && !isCurrentMove) {
-      description = "Go to move #" + move + `- row,col ${history[move]}`;
+      description = "Go to move #" +
+       move + `: Square(${currentSquareCoordinates})`;
     } else if (isCurrentMove) {
       description = "You are at move #" + move;
     } else {
