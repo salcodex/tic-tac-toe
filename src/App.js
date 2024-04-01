@@ -11,7 +11,7 @@ const Square = ({ value, onSquareClick, isWinnerSquare }) => {
   );
 };
 
-function Board({ xIsNext, squares, onPlay, setCurrentSquareCoordinates }) {
+function Board({ xIsNext, squares, onPlay}) {
   //const [squares, setSquares] = useState(Array(9).fill(null));
   //const [xIsNext, setXIsNext] = useState(true);
 
@@ -25,7 +25,7 @@ function Board({ xIsNext, squares, onPlay, setCurrentSquareCoordinates }) {
 
     //Define the symbol
     nextSquares[i] = xIsNext ? "X" : "O";
-    onPlay(nextSquares,setCurrentSquareCoordinates);
+    onPlay(nextSquares);
   }
 
   const [winner, winnerSquares] = calculateWinner(squares);
@@ -73,7 +73,6 @@ function Board({ xIsNext, squares, onPlay, setCurrentSquareCoordinates }) {
                       : rowIndex === 1
                       ? squareIndex + 3
                       : squareIndex;
-                //HERE!!!!
                   if (winnerSquares.includes(squarePosition)) {
                     return (
                       <Square
@@ -138,27 +137,28 @@ function ToggleMovesListOrder({ listOrder, setListOrder }) {
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+  const [currentSquare, setCurrentSquare] = useState([])
   //False for normal behaviour, true for ascending order
   const [listOrder, setListOrder] = useState(false);
 
   const currentSquares = history[currentMove];
   const xIsNext = currentMove % 2 === 0;
+  // const [currentSquareCoordinates, setCurrentSquareCoordinates] = useState([])
+  // console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : "Game Start"}`);
 
-  const [currentSquareCoordinates, setCurrentSquareCoordinates] = useState([])
-  console.log(`Current square coords: ${currentSquareCoordinates.length !== 0 ? currentSquareCoordinates : "Game Start"}`);
-
-  function handlePlay(nextSquares, setCurrentSquareCoordinates) {
+  function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     
     history[history.length - 1].forEach((item, index) => {
       if(nextHistory[nextHistory.length - 1][index] !== item){
         // console.log(`Yes: ${index}`);
-        setCurrentSquareCoordinates(
+        setCurrentSquare( 
           index < 3
           ? [1, index + 1]
           : index < 6
           ? [2, index - 2]
           : [3, index - 5]);
+          console.log(`Current square coordinates: ${currentSquare}`);
       } else {
         // console.log(`Nope: ${index}`);
       }
@@ -183,8 +183,11 @@ export default function Game() {
     let description;
 
     if (move > 0 && !isCurrentMove) {
+      //I have to calculate the current square coordinates
+      //and put it beside the > 1 moves
       description = "Go to move #" +
-       move + `: Square(${currentSquareCoordinates})`;
+      //do the current square calc here
+       move + `: Square(placeholder)`;
     } else if (isCurrentMove) {
       description = "You are at move #" + move;
     } else {
@@ -208,7 +211,7 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board setCurrentSquareCoordinates={setCurrentSquareCoordinates} xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board currentSquareCoordinates={currentSquare} xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
         <ToggleMovesListOrder
